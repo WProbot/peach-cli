@@ -1,0 +1,12 @@
+{
+  "name": "peach-cli",
+  "version": "1.0.0",
+  "description": "Peach CLI - Wordpress database domain migration tool",
+  "main": "index.js",
+  "repository": "https://github.com/rafaelgou/peach-cli.git",
+  "author": "Rafael Goulart<rafaelgou@rgou.net>",
+  "license": "MIT",
+  "bin": {
+    "peach": "./cli.js"
+  }
+}
