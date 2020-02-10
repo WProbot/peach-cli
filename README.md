@@ -1,5 +1,7 @@
 # Peach CLI
 
+Command line tool to migrate wordpress databases between domains.
+
 This is a command line version of [Peach](http://psaia.github.com/Peach/), 
 great work of my good friend [Pete Saia](https://github.com/psaia).
 

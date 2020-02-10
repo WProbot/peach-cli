@@ -83,7 +83,7 @@ const Peach = (function () {
      */
     _handle_serializations: function () {
       var instance = this;
-      var escapedDomain = reg_escape(this.old_domain);
+      var escapedUrl = reg_escape(this.old_domain);
       var lines = this.new_haystack.split(/(\n|\r|\r\n|\n\r)/);
 
       var replace = function (match, opener, middle, closer) {
@@ -93,7 +93,7 @@ const Peach = (function () {
         } else {
           instance.serialized_count++;
           domain = middle.replace(
-            new RegExp(escapedDomain, "gi"),
+            new RegExp(escapedUrl, "gi"),
             instance.new_domain
           );
           return 's:' + domain.length + ':' + opener + domain + closer;
@@ -131,7 +131,7 @@ const Peach = (function () {
      */
     _set_char_diff: function () {
       this.char_diff = this.new_domain.length - this.old_domain.length;
-      Peach.log('Domain character difference: '+this.char_diff+'.');
+      Peach.log('Url character difference: '+this.char_diff+'.');
     }
   };
 
@@ -179,28 +179,93 @@ const Peach = (function () {
   return Peach;
 })();
 
-const fs = require("fs");
-const path = require("path");
+/**
+ * Banner
+ */
+function banner() {
+  console.log("\nPeach CLI: Command line tool to migrate wordpress databases between domains.");
+  console.log("# Version 1.1.0 2020-02-09");
+  console.log("----------------------------------------------------------------------------")
+}
 
-try {
-  const filename  = process.argv[2];
-  const newDomain = process.argv[3];
-  const fileContent = fs.readFileSync(filename, { encoding: "utf8" });
-  const oldDomain = Peach.wp_domain(fileContent);
-  const newFilename = filename.replace(".sql", "-migrated.sql");
-  const result = Peach.migrate(fileContent, oldDomain, newDomain);
-  fs.writeFileSync(newFilename, result.new_haystack, { encoding: "utf8" });
-  console.log({ 
-    filename,
-    newFilename,
-    new_domain: result.new_domain,
-    old_domain: result.old_domain,
-    serialized_count: result.serialized_count,
-    replaced_count: result.replaced_count 
-  });
-} catch(e) {
-  console.log(e)
+/**
+ * Usage
+ */
+function usage() { 
+  console.log("Usage: peach-cli <PATH_TO_FILE> <NEW_URL>");
+  console.log("$ peach-cli /home/me/wordpress-dump.sql http://another.example.com\n")
+}
+
+/*
+ * URL Regex
+ */ 
+const filename  = process.argv[2];
+const newUrl = process.argv[3];
+
+// Plain command, display usage
+if (!filename) {
+  banner();
+  usage();
   process.exit(1);
 }
 
+// No <NEW_URL>, display error message
+if (!newUrl) {
+  console.error("\nERROR: No <NEW_URL> informed.\n");
+  banner();
+  usage();
+  process.exit(1);
+}
+
+const fs = require("fs");
+const path = require("path");
+
+// Check file existence
+let fileContent;
+try {
+  fileContent = fs.readFileSync(filename, { encoding: "utf8" });
+} catch (e) {
+  console.error("\nERROR: " + e.message);
+  banner();
+  usage();
+  process.exit(1);
+}
+
+/**
+ * @see https://gist.github.com/dperini/729294
+ */
+const regex = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i
+
+const test = regex.test(newUrl);
+
+// Check URL
+if (!regex.test(newUrl)) {
+  console.error("\nERROR: <NEW_URL> is invalid: " + newUrl + "\n");
+  banner();
+  usage();
+  process.exit(1);
+}
+
+
+try {
+  const oldUrl = Peach.wp_domain(fileContent);
+  const newFilename = filename.replace(".sql", "-migrated.sql");
+  const result = Peach.migrate(fileContent, oldUrl, newUrl);
+  fs.writeFileSync(newFilename, result.new_haystack, { encoding: "utf8" });
+  banner();
+  console.log("SUCCESS!");
+  console.log("Original file: " + filename);
+  console.log("Migrated file: " + newFilename);
+  console.log("Old URL: " + result.old_domain);
+  console.log("New URL: " + result.new_domain);
+  console.log("Serialized count: " + result.serialized_count);
+  console.log("Replaced count: " + result.replaced_count);
+} catch(e) {
+  console.error("\nERROR: " + e.message);
+  banner();
+  usage();
+  process.exit(1);
+}
+
+process.exit(0);
 
