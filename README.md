@@ -24,13 +24,13 @@ But, if you like a little more automation, use **Peach command**. Yeah, this too
 ## Install
 
 ```bash
-npm install -g rafaelgou/peach-cli
+npm install -g @rafaelgou/peach-cli
 ```
 
 or
 
 ```bash
-yarn global rafaelgou/peach-cli
+yarn global @rafaelgou/peach-cli
 ```
 
 to install the command line globally.
