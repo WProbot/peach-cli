@@ -1,5 +1,5 @@
 {
-  "name": "peach-cli",
+  "name": "rafaelgou/peach-cli",
   "version": "1.0.0",
   "description": "Peach CLI - Wordpress database domain migration tool",
   "main": "index.js",

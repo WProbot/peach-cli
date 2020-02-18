@@ -2,17 +2,17 @@
 
 Command line tool to migrate wordpress databases between domains.
 
-This is a command line version of [Peach](http://psaia.github.com/Peach/), 
+This is a command line version of [Peach](http://psaia.github.com/Peach/),
 great work of my good friend [Pete Saia](https://github.com/psaia).
 
 ## The problem
 
 - You are developing a [Wordpress](https://wordpress.org) website locally.
 - You setup a dummy domain, like `http://localhost` or `http://localhost:8000`
-or even `http://mysite.local`
+  or even `http://mysite.local`
 - The site is ready to go staging/production (like `http://mycoolsite.com`)
 - You make a database dump from your local
-- You restore the dump on staging/production 
+- You restore the dump on staging/production
 - ... and all links a broken because the old domain (`http://mysite.local` is not cool on production)
 
 ## The solution
@@ -27,7 +27,7 @@ But, if you like a little more automation, use **Peach command**. Yeah, this too
 npm install -g rafaelgou/peach-cli
 ```
 
-or 
+or
 
 ```bash
 yarn global rafaelgou/peach-cli
